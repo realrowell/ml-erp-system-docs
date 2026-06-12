@@ -16,6 +16,14 @@
           "index",
           "quickstart"
         ]
+      },
+      {
+        "group": "Using the app",
+        "pages": [
+          "guides/admin",
+          "guides/technician",
+          "guides/collector"
+        ]
       }
     ],
     "global": {

@@ -1,0 +1,185 @@
+---
+title: "Admin guide"
+description: "Manage users, locations, vendos, customers, finances, and support as an admin"
+---
+
+The **Admin** role has full access to every workspace in the ERP. Admins set up the data that everyone else depends on: user accounts, collection teams, locations, vendos, customers, and the financial and support workspaces.
+
+Admins sign in to the main dashboard at `/dashboard`. Every section below is reachable from the side navigation once you have an account with the `admin` role.
+
+## Who should use this guide
+
+Use this guide if you are responsible for:
+
+- Onboarding technicians, collectors, and other admins
+- Maintaining the master list of barangays, municipalities, and vendos
+- Onboarding customers and managing their contracts
+- Reviewing revenue, payouts, payables, and operating expenses
+- Triaging support tickets across the organization
+
+## User and team management
+
+Admins manage every account that can sign in to the system.
+
+### User accounts
+
+Navigate to **User → Accounts** to list, create, edit, and deactivate users.
+
+- **Create:** assign a name, email, password, and role (`admin`, `technician`, or `collector`). The role controls which dashboard the user sees after sign in.
+- **Edit:** update profile fields or change the user's status.
+- **Delete:** soft-deletes the account by moving it to the `deleted` status. The user can no longer sign in.
+
+User status lifecycle:
+
+| Status     | Meaning                                       |
+| ---------- | --------------------------------------------- |
+| `active`   | Can sign in and use the app                   |
+| `inactive` | Sign in is blocked, record is preserved       |
+| `deleted`  | Soft-deleted, hidden from default user lists  |
+
+### Collection teams
+
+Navigate to **User → Collection teams** to group collectors who work the same route. Create a team, then assign one or more collector accounts to it. Teams are referenced by customer-vendo contracts so that the right group is dispatched for collection.
+
+## Locations
+
+Locations are required before you can create a vendo or customer address.
+
+- **Locations → Municipalities:** create, edit, and delete municipalities.
+- **Locations → Barangays:** create, edit, and delete barangays. Each barangay belongs to a municipality.
+
+Add municipalities first, then add barangays under them.
+
+## Vendos
+
+Vendos are the field assets you deploy to customers. Manage them under **Assets → Vendos**.
+
+### Vendo lifecycle
+
+| Status              | When it applies                                                |
+| ------------------- | -------------------------------------------------------------- |
+| `active`            | Deployed and operating normally                                |
+| `inactive`          | Registered but not currently deployed                          |
+| `under_repair`      | A repair ticket is in progress                                 |
+| `under_maintenance` | A scheduled maintenance ticket is in progress                  |
+| `offline`           | Not reporting to the system                                    |
+| `decommissioned`    | Permanently retired                                            |
+
+### Day-to-day tasks
+
+- **Create a vendo** from **Assets → Vendos → Create** by filling out the form with the model, serial, and location.
+- **Bulk import** vendos from CSV via **Assets → Vendos → Import**. Each row becomes a new vendo record.
+- **Export** the current vendo list as CSV or PDF for reporting or audit.
+- **View a vendo** to see its profile, current status, contract, and full event timeline.
+- **View vendo logs** for an audit trail of every lifecycle, financial, repair, maintenance, incident, operational, connectivity, and system event recorded against the unit.
+
+### Reading the vendo log
+
+Each vendo log entry is tagged with a **type** (for example `created`, `collection`, `repair_requested`, `maintenance_completed`, `relocation`, `status_change`, `online`, `offline`) and a **category** (`lifecycle`, `financial`, `repair`, `maintenance`, `incident`, `operational`, `connectivity`, `system`). Use the category filter to focus on a single class of events when investigating an issue.
+
+## Customers and contracts
+
+Manage customers under **CRM → Customers**.
+
+### Customer status
+
+| Status      | Meaning                                                   |
+| ----------- | --------------------------------------------------------- |
+| `active`    | Currently being served and billed                         |
+| `inactive`  | Not currently serviced, kept on file                      |
+| `suspended` | Temporarily blocked from new contracts (for example, due to non-payment) |
+
+### Workflow
+
+1. **Create a customer** under **CRM → Customers → Create**. Add at least one customer address while creating the profile; addresses reference the barangay and municipality records you set up earlier.
+2. **Create a collection period** under **CRM → Collection periods**. This defines the cadence used for billing and payouts.
+3. **Create a customer-vendo contract** under **CRM → Customer-vendo contracts → Create**. A contract links a customer, a vendo, a collection period, and the collection team that services the unit.
+4. **Amend a contract** from the contract detail view when terms change. Amendments preserve the original record in the audit trail.
+
+## Financial operations
+
+The FinOps workspace is grouped under **Financial operations** in the side navigation.
+
+### Revenue
+
+- **Revenues → Dashboard** summarizes revenue by period.
+- **Revenues → Index** lists individual revenue entries.
+- **Vendo dashboard** drills into a single vendo's revenue, payouts, and support history. Use the **Revenue create**, **Payout create**, and **Support create** shortcuts from this view to file entries scoped to the selected vendo.
+
+### Transactions
+
+Every revenue and payout entry is backed by a transaction. Transactions carry:
+
+- **Type:** `collection`, `refund`, or `adjustment`.
+- **Status:** `pending`, `confirmed`, or `cancelled`. Only confirmed transactions are counted as realized revenue.
+- **Source:** `system` (generated by automation), `mobile` (created from the collector or technician app), or `manual` (created by an admin in the web UI).
+
+### Customer payables
+
+**Financial operations → Payables** lists what each customer owes for a billing period.
+
+| Payable status   | Meaning                          |
+| ---------------- | -------------------------------- |
+| `unpaid`         | No payment received yet          |
+| `partially_paid` | Some payment received            |
+| `paid`           | Fully settled                    |
+
+Open a payable to view its line items, or use **Print** to generate a printable statement.
+
+### Customer payouts
+
+**Financial operations → Payouts** records money disbursed to customers (for example, a customer's share of vendo revenue). Each payout captures the payment method:
+
+- `cash`
+- `gcash`
+- `bank_transfer`
+
+Use **Print** to produce a payout receipt.
+
+### Operational expenses (OpEx)
+
+**Financial operations → Operational expenses** logs costs incurred while running the field operation. Expense types include:
+
+`maintenance`, `repair`, `fuel`, `supply`, `allowance`, `meals`, `transportation`, `lodging`, `communication`, `equipment_rental`, `vehicle_rental`, `other`.
+
+## Support tickets
+
+Admins triage and audit every ticket from **Supports → Tickets**.
+
+### Ticket type
+
+| Type                | Use for                                              |
+| ------------------- | ---------------------------------------------------- |
+| `repair`            | Hardware or software fault on a vendo                |
+| `maintenance`       | Scheduled preventive work                            |
+| `customer_care`     | Non-billing customer requests                        |
+| `customer_billing`  | Billing disputes and adjustments                     |
+
+### Priority
+
+`low`, `medium`, or `high`. Set this when creating the ticket. Technicians sort their queue by priority.
+
+### Status lifecycle
+
+```
+open ──► pending ──► ongoing ──► resolved
+   │           │           │
+   └───────────┴───────────┴───► cancelled
+```
+
+| Status      | Meaning                                                          |
+| ----------- | ---------------------------------------------------------------- |
+| `open`      | Newly created, awaiting assignment                               |
+| `pending`   | Assigned to a technician but not yet accepted                    |
+| `ongoing`   | Technician has accepted and started work                         |
+| `resolved`  | Work complete, ticket closed                                     |
+| `cancelled` | Closed without a fix (for example, false alarm or duplicate)     |
+
+### What admins can do
+
+- Create a ticket on behalf of a customer or technician.
+- Attach photos as evidence.
+- Reassign a ticket to a different technician.
+- Close a ticket directly from the admin view when the technician is unavailable.
+
+Every status change is recorded in the ticket's change log along with the user who made it.
