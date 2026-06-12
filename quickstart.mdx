@@ -1,47 +1,129 @@
 ---
 title: "Quickstart"
-description: "Begin with a guide on the fastest path to a successful outcome"
+description: "Run ML ERP locally and sign in as the seeded super admin"
 ---
 
-Describe how someone begins using your product. What is the first thing they need to do? Are there any prerequisites?
-
-A quickstart should take someone from zero to using your product. They'll get a quick win and a sense of what they can accomplish.
+This guide takes you from a fresh clone to a running ML ERP instance with the admin, technician, and collector dashboards available in your browser.
 
 ## Prerequisites
 
-Before you begin, you must have:
+Before you begin, install:
 
-- Requirement one (for example, Node.js 18+, a free account, an API key)
-- Requirement two (for example, a compatible device, a compatible browser, a compatible operating system)
+- **PHP 8.4** with the typical Laravel extensions (`mbstring`, `xml`, `bcmath`, `sqlite3`, `curl`, `intl`)
+- **Composer 2**
+- **Node.js 20+** and **npm**
+- **Git**
 
-## Get started
+SQLite is used by default, so no separate database server is required for local development. You can switch to MySQL or PostgreSQL later by editing `.env`.
+
+## Set up the project
 
 <Steps>
-  <Step title="Install">
-    Describe how to install your product or sign up.
+  <Step title="Clone and install dependencies">
+    Clone the repository, then install PHP and JavaScript dependencies.
 
     ```bash
-    npm install your-package
+    git clone https://github.com/realrowell/ml-erp-system.git
+    cd ml-erp-system
+    composer install
+    npm install
     ```
   </Step>
-  <Step title="Configure">
-    Describe any setup or configuration needed before first use.
+
+  <Step title="Create your environment file">
+    Copy the example environment file and generate an application key.
 
     ```bash
-    your-cli init
+    cp .env.example .env
+    php artisan key:generate
+    ```
+
+    The defaults use SQLite. If `database/database.sqlite` does not exist, create it:
+
+    ```bash
+    touch database/database.sqlite
+    ```
+
+    To use MySQL or PostgreSQL instead, update the `DB_*` variables in `.env` before running migrations.
+  </Step>
+
+  <Step title="Run migrations and seed data">
+    Migrate the schema and seed reference data (app settings, the super admin user, collection teams, municipalities, and barangays).
+
+    ```bash
+    php artisan migrate --seed
+    ```
+
+    The seeder creates a super admin you can use to sign in immediately:
+
+    | Field    | Value                  |
+    | -------- | ---------------------- |
+    | Username | `jay_su`               |
+    | Password | `05052000`             |
+    | Role     | `admin` (super admin)  |
+
+    <Warning>
+      Change this password before exposing the application to anyone else. The seeded credentials are intended for local development only.
+    </Warning>
+  </Step>
+
+  <Step title="Start the dev servers">
+    Run the Laravel server, queue worker, and Vite dev server together with the bundled Composer script:
+
+    ```bash
+    composer run dev
+    ```
+
+    This runs `php artisan serve`, `php artisan queue:listen`, and `npm run dev` concurrently. Prefer to manage them yourself? Run them in separate terminals:
+
+    ```bash
+    php artisan serve
+    php artisan queue:listen --tries=1
+    npm run dev
     ```
   </Step>
-  <Step title="Run it">
-    Show the first thing a user does to see it working.
 
-    ```bash
-    your-cli start
-    ```
+  <Step title="Sign in">
+    Open [http://localhost:8000](http://localhost:8000), sign in with the seeded super admin credentials, and you will land on the admin dashboard with the CRM, Asset, FinOps, and Support modules available in the navigation.
   </Step>
 </Steps>
 
-<Tip>
-  Give people a way to get help. This could be a link to a support page, a chat with a customer support agent, or a forum for your product.
+## Create technician and collector users
 
-  Example: Need help? Reach out to us at [support@yourcompany.com](mailto:support@yourcompany.com).
+Additional staff accounts are created from the admin app, not the seeder. Once you are signed in as an admin:
+
+1. Open the **Users** section from the admin navigation.
+2. Create a new user and assign one of the three roles:
+   - `admin` — full access, plus the admin dashboard
+   - `technician` — Vendo servicing and support tickets
+   - `collector` — collection periods and cash reconciliation
+3. Share the credentials with the staff member. They will land on the dashboard for their role on first sign-in.
+
+## Enable two-factor authentication
+
+ML ERP ships with Laravel Fortify, so any user can enable 2FA from **Settings → Security**:
+
+1. Click **Enable two-factor authentication**.
+2. Scan the QR code with an authenticator app (1Password, Authy, Google Authenticator, etc.).
+3. Save the recovery codes somewhere safe.
+4. Confirm the code from your authenticator to finish enrollment.
+
+## Useful commands
+
+```bash
+# Run the test suite (lint + Pest)
+composer test
+
+# Format code with Pint
+composer lint
+
+# Build production assets
+npm run build
+
+# Tail application logs
+php artisan pail
+```
+
+<Tip>
+  Stuck? Re-run `php artisan migrate:fresh --seed` to reset the database to a clean seeded state, then restart `composer run dev`.
 </Tip>
