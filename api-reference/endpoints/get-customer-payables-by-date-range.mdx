@@ -1,0 +1,62 @@
+---
+title: "Get customer payables by date range"
+description: "List customer payables recorded inside a date window."
+api: "GET /api/v1/finops/get-customer-payables-by-date-range/{start_date}/{end_date}"
+---
+
+Returns every customer payable whose `transaction_timestamp` falls inside the requested window. Use this to track outstanding obligations to customers or to reconcile payables against payouts.
+
+Each payable is returned with the originating transaction, the Vendo contract (with the contracted Vendo unit and customer), and the customer the payable is owed to.
+
+## Authentication
+
+Requires a Sanctum bearer token. See [Authentication](/api-reference/authentication).
+
+## Path parameters
+
+<ParamField path="start_date" type="string" required>
+  Inclusive lower bound for `transaction_timestamp`. Recommended format `YYYY-MM-DD`. Anchored to `00:00:00`.
+</ParamField>
+
+<ParamField path="end_date" type="string" required>
+  Inclusive upper bound for `transaction_timestamp`. Recommended format `YYYY-MM-DD`. Anchored to `23:59:59`.
+</ParamField>
+
+## Request
+
+```bash
+curl https://<your-erp-host>/api/v1/finops/get-customer-payables-by-date-range/2026-06-01/2026-06-12 \
+  -H "Authorization: Bearer <your-token>" \
+  -H "Accept: application/json"
+```
+
+## Response
+
+`200 OK` — payables are ordered by `transaction_timestamp` ascending.
+
+```json
+{
+  "success": true,
+  "customer_payables": [
+    {
+      "amount": "750.00",
+      "status": "PENDING",
+      "transaction_timestamp": "2026-06-01T08:42:13.000000Z",
+      "remarks": null,
+      "customer": { "...": "..." },
+      "transaction": {
+        "transaction_number": "TN-2606010000001",
+        "vendo_contract": {
+          "vendo": { "...": "..." },
+          "customer": { "...": "..." }
+        }
+      }
+    }
+  ]
+}
+```
+
+## Notes
+
+- The `status` field reflects whether the payable has been settled. Pair this endpoint with [Get customer payouts by date range](/api-reference/endpoints/get-customer-payouts-by-date-range) to reconcile open balances.
+- An empty `customer_payables` array is returned when no payables fall inside the window.

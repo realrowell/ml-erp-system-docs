@@ -1,0 +1,70 @@
+---
+title: "Get Vendo from QR code"
+description: "Resolve a Vendo unit from a scanned QR code payload."
+api: "GET /api/v1/vendo-dashboard/get-vendo-from-qrcode"
+---
+
+Looks up a Vendo unit by the public identifier encoded in its QR code. Use this from a scanner app or field tool to confirm a physical unit, fetch its current status, and route the operator to the right workflow.
+
+## Authentication
+
+Requires a Sanctum bearer token. See [Authentication](/api-reference/authentication).
+
+## Query parameters
+
+<ParamField query="id" type="string" required>
+  The Vendo's `public_id` as encoded in the QR code.
+</ParamField>
+
+<ParamField query="vendo_number" type="string">
+  Optional human-readable Vendo number. Accepted for client-side correlation and logged on the server, but not used to look up the record.
+</ParamField>
+
+## Request
+
+```bash
+curl "https://<your-erp-host>/api/v1/vendo-dashboard/get-vendo-from-qrcode?id=vnd_01HZABC123" \
+  -H "Authorization: Bearer <your-token>" \
+  -H "Accept: application/json"
+```
+
+## Response
+
+`200 OK` — Vendo found.
+
+```json
+{
+  "success": true,
+  "vendo": {
+    "public_id": "vnd_01HZABC123",
+    "vendo_number": "V-000123",
+    "status": "ACTIVE",
+    "...": "..."
+  }
+}
+```
+
+`404 Not Found` — no Vendo matches the supplied `id`.
+
+```json
+{
+  "success": false,
+  "message": "Vendo not found"
+}
+```
+
+`422 Unprocessable Entity` — the `id` parameter is missing or not a string.
+
+```json
+{
+  "message": "The id field is required.",
+  "errors": {
+    "id": ["The id field is required."]
+  }
+}
+```
+
+## Notes
+
+- Always check the top-level `success` flag before reading `vendo` — `vendo` is omitted on `404`.
+- The lookup is exact match on `public_id`. Pass the value exactly as decoded from the QR payload.

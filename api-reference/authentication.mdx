@@ -1,0 +1,49 @@
+---
+title: "Authentication"
+description: "Authenticate API requests with Laravel Sanctum bearer tokens."
+---
+
+The ERP REST API uses [Laravel Sanctum](https://laravel.com/docs/sanctum) personal access tokens. Every request must include a bearer token belonging to an active user account.
+
+## Issue a token
+
+Tokens are issued from inside the ERP. As an administrator:
+
+1. Sign in to the ERP web app.
+2. Open the user account you want to issue a token for.
+3. Generate a new personal access token and copy the value shown. The plain-text token is only displayed once.
+4. Store the token in your integration's secret manager.
+
+Tokens inherit the permissions of the user they belong to. Issue them to a dedicated integration user when possible so you can revoke access without affecting a real operator.
+
+## Send the token
+
+Attach the token to every request using the `Authorization` header with the `Bearer` scheme, and request a JSON response with `Accept: application/json`:
+
+```bash
+curl https://<your-erp-host>/api/user \
+  -H "Authorization: Bearer <your-token>" \
+  -H "Accept: application/json"
+```
+
+## Verify the token
+
+Use `GET /api/user` to confirm a token is valid and to read the user it belongs to. See [Get current user](/api-reference/endpoints/get-user) for the response shape.
+
+## Revoke a token
+
+Revoke tokens from the same account screen they were issued from. Revoked tokens immediately return `401 Unauthenticated` on subsequent requests.
+
+## Error responses
+
+| Status | Meaning |
+| ------ | ------- |
+| `401 Unauthenticated` | The `Authorization` header is missing, malformed, or references a revoked token. |
+| `403 Forbidden` | The token's user does not have permission for the requested resource. |
+| `419` | CSRF / session mismatch — make sure you are calling the API with a bearer token, not a session cookie. |
+
+## Security tips
+
+- Treat tokens like passwords. Never commit them to source control or expose them in client-side code.
+- Rotate tokens on a schedule and immediately when a teammate with access leaves.
+- Use HTTPS for every request. Plain HTTP will leak the token.

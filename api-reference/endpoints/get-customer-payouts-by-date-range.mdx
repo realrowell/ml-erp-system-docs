@@ -1,0 +1,66 @@
+---
+title: "Get customer payouts by date range"
+description: "List customer payouts settled inside a date window."
+api: "GET /api/v1/finops/get-customer-payouts-by-date-range/{start_date}/{end_date}"
+---
+
+Returns every customer payout whose `transaction_timestamp` falls inside the requested window. Use this to mirror disbursements into an accounting system or to drive payout reports.
+
+Each payout is returned with its parent customer payable, the originating transaction, the Vendo contract (including the contracted Vendo unit and customer), and the customer the payout was made to.
+
+## Authentication
+
+Requires a Sanctum bearer token. See [Authentication](/api-reference/authentication).
+
+## Path parameters
+
+<ParamField path="start_date" type="string" required>
+  Inclusive lower bound for `transaction_timestamp`. Recommended format `YYYY-MM-DD`. Anchored to `00:00:00`.
+</ParamField>
+
+<ParamField path="end_date" type="string" required>
+  Inclusive upper bound for `transaction_timestamp`. Recommended format `YYYY-MM-DD`. Anchored to `23:59:59`.
+</ParamField>
+
+## Request
+
+```bash
+curl https://<your-erp-host>/api/v1/finops/get-customer-payouts-by-date-range/2026-06-01/2026-06-12 \
+  -H "Authorization: Bearer <your-token>" \
+  -H "Accept: application/json"
+```
+
+## Response
+
+`200 OK` — payouts are ordered by `transaction_timestamp` ascending.
+
+```json
+{
+  "success": true,
+  "customer_payouts": [
+    {
+      "amount": "750.00",
+      "payment_method": "BANK_TRANSFER",
+      "transaction_timestamp": "2026-06-02T10:15:00.000000Z",
+      "remarks": null,
+      "customer_payable": {
+        "amount": "750.00",
+        "status": "PAID",
+        "customer": { "...": "..." },
+        "transaction": {
+          "transaction_number": "TN-2606010000001",
+          "vendo_contract": {
+            "vendo": { "...": "..." },
+            "customer": { "...": "..." }
+          }
+        }
+      }
+    }
+  ]
+}
+```
+
+## Notes
+
+- An empty `customer_payouts` array is returned when no payouts fall inside the window.
+- The endpoint returns all payouts in the window regardless of payment method. Filter client-side if you need a single channel.
