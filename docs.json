@@ -16,6 +16,23 @@
           "index",
           "quickstart"
         ]
+      },
+      {
+        "group": "API Reference",
+        "pages": [
+          "api-reference/introduction",
+          "api-reference/authentication",
+          {
+            "group": "Endpoints",
+            "pages": [
+              "api-reference/endpoints/get-user",
+              "api-reference/endpoints/get-transactions-by-date-range",
+              "api-reference/endpoints/get-customer-payouts-by-date-range",
+              "api-reference/endpoints/get-customer-payables-by-date-range",
+              "api-reference/endpoints/get-vendo-from-qrcode"
+            ]
+          }
+        ]
       }
     ],
     "global": {

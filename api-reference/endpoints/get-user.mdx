@@ -1,0 +1,37 @@
+---
+title: "Get current user"
+description: "Return the user account associated with the Sanctum bearer token."
+api: "GET /api/user"
+---
+
+Returns the authenticated user behind the bearer token. Use this to verify that a token is valid before running a longer integration job, or to discover which user a token belongs to.
+
+## Authentication
+
+Requires a Sanctum bearer token. See [Authentication](/api-reference/authentication).
+
+## Request
+
+```bash
+curl https://<your-erp-host>/api/user \
+  -H "Authorization: Bearer <your-token>" \
+  -H "Accept: application/json"
+```
+
+## Response
+
+`200 OK` — the user model for the token owner.
+
+```json
+{
+  "id": "01HZ...",
+  "name": "Integration Bot",
+  "email": "integrations@example.com",
+  "role": "admin",
+  "status": "active",
+  "created_at": "2026-01-15T09:12:00.000000Z",
+  "updated_at": "2026-06-10T03:44:21.000000Z"
+}
+```
+
+If the token is missing, invalid, or revoked, the endpoint returns `401 Unauthenticated`.

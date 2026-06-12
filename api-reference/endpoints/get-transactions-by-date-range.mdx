@@ -1,0 +1,73 @@
+---
+title: "Get transactions by date range"
+description: "List collection transactions inside a date window."
+api: "GET /api/v1/finops/get-transactions-by-date-range/{start_date}/{end_date}"
+---
+
+Returns every `COLLECTION` transaction whose `transaction_timestamp` falls inside the requested window. Use this to mirror collection activity into reporting tools or to reconcile daily collection totals against an external ledger.
+
+Each transaction is returned with its related customer, Vendo, collection period, performing user (and their collection team), Vendo contract (and its collection team), and the underlying transaction details and snapshots, so a single call gives you the full context needed for reporting.
+
+## Authentication
+
+Requires a Sanctum bearer token. See [Authentication](/api-reference/authentication).
+
+## Path parameters
+
+<ParamField path="start_date" type="string" required>
+  Inclusive lower bound for `transaction_timestamp`. Recommended format `YYYY-MM-DD`. The server anchors this value to `00:00:00` of that day.
+</ParamField>
+
+<ParamField path="end_date" type="string" required>
+  Inclusive upper bound for `transaction_timestamp`. Recommended format `YYYY-MM-DD`. The server anchors this value to `23:59:59` of that day.
+</ParamField>
+
+## Request
+
+```bash
+curl https://<your-erp-host>/api/v1/finops/get-transactions-by-date-range/2026-06-01/2026-06-12 \
+  -H "Authorization: Bearer <your-token>" \
+  -H "Accept: application/json"
+```
+
+## Response
+
+`200 OK` — transactions are ordered by `transaction_timestamp` ascending.
+
+```json
+{
+  "success": true,
+  "transactions": [
+    {
+      "transaction_number": "TN-2606010000001",
+      "trans_type": "COLLECTION",
+      "status": "POSTED",
+      "gross_amount": "1500.00",
+      "source": "FIELD",
+      "remarks": null,
+      "transaction_timestamp": "2026-06-01T08:42:13.000000Z",
+      "sync_status": "SYNCED",
+      "sync_at": "2026-06-01T08:42:15.000000Z",
+      "customer": { "...": "..." },
+      "vendo": { "...": "..." },
+      "collection_period": { "...": "..." },
+      "performed_by": {
+        "name": "Jane Collector",
+        "collection_team": { "...": "..." }
+      },
+      "vendo_contract": {
+        "collection_team": { "...": "..." }
+      },
+      "transaction_details": [],
+      "transaction_snapshots": []
+    }
+  ]
+}
+```
+
+Internal identifiers (database primary keys and foreign keys) are hidden from the response. Use `transaction_number` as the stable external identifier.
+
+## Notes
+
+- Only transactions with `trans_type = COLLECTION` are returned. Other transaction types are excluded by design.
+- An empty `transactions` array is returned when no records fall inside the window — this is not an error.

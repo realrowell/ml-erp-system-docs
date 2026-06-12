@@ -1,0 +1,82 @@
+---
+title: "Introduction"
+description: "Overview of the ERP REST API for integrators."
+---
+
+The ERP REST API lets external systems read FinOps data (transactions, customer payouts, customer payables) and look up Vendo units scanned from QR codes. Use it when you need to mirror collection data into a data warehouse, drive reporting dashboards, or build companion mobile tooling that resolves Vendo QR codes.
+
+## Base URL
+
+All endpoints live under the `/api` prefix on your ERP installation:
+
+```
+https://<your-erp-host>/api
+```
+
+## Versioning
+
+Resource endpoints are namespaced under a version segment. The current version is `v1`:
+
+```
+https://<your-erp-host>/api/v1/...
+```
+
+Future breaking changes will be released under a new version prefix (for example, `v2`). Existing `v1` routes will continue to be served until a deprecation notice is published.
+
+The `GET /api/user` endpoint used to verify the authenticated user is not versioned and sits directly under `/api`.
+
+## Authentication
+
+Every endpoint requires a Laravel Sanctum bearer token. See [Authentication](/api-reference/authentication) for how to issue tokens and attach them to requests.
+
+## Response format
+
+All endpoints return JSON. Successful responses include a `success` boolean alongside the resource payload:
+
+```json
+{
+  "success": true,
+  "transactions": []
+}
+```
+
+Error responses use standard HTTP status codes. A missing resource returns `404` with a message:
+
+```json
+{
+  "success": false,
+  "message": "Vendo not found"
+}
+```
+
+Validation errors return `422` with a Laravel-style `errors` object.
+
+## Date-range parameters
+
+The FinOps endpoints accept a `start_date` and `end_date` as path parameters. Both values are parsed permissively (any format Carbon understands), but the recommended canonical form is `YYYY-MM-DD`:
+
+```
+/api/v1/finops/get-transactions-by-date-range/2026-06-01/2026-06-12
+```
+
+The server expands the range to cover the full day for both bounds — `start_date` is anchored to `00:00:00` and `end_date` to `23:59:59` in the server's local timezone. Records are filtered on each resource's `transaction_timestamp` and returned in ascending order.
+
+## Endpoints
+
+<CardGroup cols={2}>
+  <Card title="Get current user" href="/api-reference/endpoints/get-user">
+    Verify the authenticated user behind a Sanctum token.
+  </Card>
+  <Card title="Get transactions by date range" href="/api-reference/endpoints/get-transactions-by-date-range">
+    Pull collection transactions for a given window.
+  </Card>
+  <Card title="Get customer payouts by date range" href="/api-reference/endpoints/get-customer-payouts-by-date-range">
+    Pull customer payouts settled in a given window.
+  </Card>
+  <Card title="Get customer payables by date range" href="/api-reference/endpoints/get-customer-payables-by-date-range">
+    Pull customer payables recorded in a given window.
+  </Card>
+  <Card title="Get Vendo from QR code" href="/api-reference/endpoints/get-vendo-from-qrcode">
+    Resolve a Vendo unit from a scanned QR payload.
+  </Card>
+</CardGroup>
