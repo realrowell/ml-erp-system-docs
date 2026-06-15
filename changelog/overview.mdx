@@ -1,0 +1,30 @@
+---
+title: "Changelog"
+description: "Product updates and improvements to ML ERP"
+---
+
+<Update label="2026-06-15" description="Week of June 15, 2026">
+
+## New features
+
+**Role-based dashboards across the app.** Admin, technician, and collector users now sign in to dedicated home screens that surface only the work each role needs. See the [Admin guide](/guides/admin), [Technician guide](/guides/technician), and [Collector guide](/guides/collector).
+
+**Field collections via QR scanner.** Collectors can scan a vendo's QR sticker from the mobile app to look up the contract and record a `collection` transaction in one flow. The contract immediately flips to "collected" for the current period. See [Collecting from a vendo](/guides/collector#collecting-from-a-vendo-qr-scanner).
+
+**Support ticket lifecycle for technicians.** Technicians can accept, start, resolve, and cancel tickets from the dashboard, with priority (`low`, `medium`, `high`) and type (`repair`, `maintenance`, `customer_care`, `customer_billing`) tags. Every transition is recorded with a timestamp. See [Ticket lifecycle](/guides/technician#ticket-lifecycle).
+
+**Vendo QR codes for field work.** Technicians can scan a vendo's QR sticker to jump straight to its detail view and file a new ticket on the spot. See [Working from the vendo](/guides/technician#working-from-the-vendo-qr-scanner).
+
+**Two-factor authentication.** Profile settings now include 2FA enrollment alongside password and profile management.
+
+## Updates
+
+**Bulk import and PDF export for vendos.** The asset registry supports CSV bulk import and PDF report export from the vendo workspace.
+
+**Collection periods drive the collector dashboard.** The dashboard is now organized around the active collection period, with a "Due today" list for your team and a full list of contracts scheduled for the period.
+
+**User status lifecycle.** Admins can move user accounts through `active`, `inactive`, and `deleted` states. Deactivated users are blocked from signing in; deleted users are soft-deleted and hidden from default lists.
+
+**Collection teams.** Admins can group collectors into teams and reference them on customer-vendo contracts so the right group is dispatched.
+
+</Update>
