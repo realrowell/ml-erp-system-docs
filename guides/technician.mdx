@@ -1,0 +1,85 @@
+---
+title: "Technician guide"
+description: "Accept tickets, work on vendos in the field, and keep your profile current"
+---
+
+The **Technician** role is for field staff who repair and maintain vendos. After you sign in, the app takes you to the technician dashboard at `/technician/dashboard`. You can only see and act on the screens described in this guide.
+
+## Who should use this guide
+
+Use this guide if you:
+
+- Receive support tickets for vendo repairs or maintenance
+- Visit customer sites to work on vendos
+- File new tickets when you find a problem at a vendo
+
+## The technician dashboard
+
+Open the dashboard from the side navigation. It shows the tickets assigned to you, grouped by their current status:
+
+| Status      | What it means for you                                              |
+| ----------- | ------------------------------------------------------------------ |
+| `open`      | Available work that has not been assigned                          |
+| `pending`   | Assigned to you, waiting for you to accept                         |
+| `ongoing`   | You have started work and the clock is running                     |
+| `resolved`  | You marked it complete                                             |
+| `cancelled` | Closed without a fix                                               |
+
+Tickets are also tagged with a **priority** (`low`, `medium`, `high`) and a **type** (`repair`, `maintenance`, `customer_care`, `customer_billing`). Sort by priority to focus on the most urgent work first.
+
+## Ticket lifecycle
+
+Tap a ticket card on the dashboard to open its detail view. From there you have four actions that move it through the lifecycle:
+
+<Steps>
+  <Step title="Accept the ticket">
+    Move the ticket from `pending` to `ongoing` for yourself. Use this when you've reviewed the details and committed to the work.
+  </Step>
+  <Step title="Start the ticket">
+    Record that you are now on site or actively working. The start time is logged and feeds into reporting.
+  </Step>
+  <Step title="Resolve the ticket">
+    Mark the work complete. Add a resolution note and attach photos that show the finished work or replaced parts. The ticket moves to `resolved` and disappears from your active queue.
+  </Step>
+  <Step title="Cancel the ticket">
+    Use this only when no fix is needed (false alarm, duplicate, or unreachable customer). Add a reason; the ticket moves to `cancelled` and is preserved in the audit log.
+  </Step>
+</Steps>
+
+Every transition is recorded along with your user and a timestamp. If you make a mistake, an admin can reopen the ticket from the support workspace.
+
+## Profile
+
+Open **Profile** from the side navigation to keep your technician record up to date. From the profile screen you can:
+
+- Review the contact and emergency information your dispatchers see
+- Update fields when something changes (phone number, address, certifications)
+
+Keeping this current is important so dispatchers can reach you and assign tickets correctly.
+
+## Working from the vendo (QR scanner)
+
+The **Vendo** entry in the navigation opens the QR code scanner. Use it whenever you are physically next to a unit.
+
+<Steps>
+  <Step title="Scan the QR code">
+    Point your device camera at the QR sticker on the vendo. The app looks up the unit and opens its dashboard.
+  </Step>
+  <Step title="Review the vendo dashboard">
+    The vendo dashboard shows the unit's current status, its assigned customer, recent revenue, and the most recent log entries.
+  </Step>
+  <Step title="Create a ticket from the vendo">
+    If you spot a problem, tap **Create ticket**. The ticket is pre-filled with the vendo's identifiers so dispatch knows exactly which unit you mean. Set the type and priority before submitting.
+  </Step>
+</Steps>
+
+## Vendo status you'll see in the field
+
+| Status              | What to do                                                                 |
+| ------------------- | -------------------------------------------------------------------------- |
+| `active`            | Unit is in service. Do not touch unless a ticket says so.                  |
+| `inactive`          | Unit is not deployed. Confirm with dispatch before working on it.          |
+| `under_repair`      | Your ticket is in progress. Update the ticket status as you work.          |
+| `under_maintenance` | A scheduled maintenance ticket is in progress.                             |
+| `offline`           | The unit is not reporting. Investigate connectivity before opening it up.  |
+| `decommissioned`    | Retired. Escalate before doing any work.                                   |

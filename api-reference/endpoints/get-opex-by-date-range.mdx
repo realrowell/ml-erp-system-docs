@@ -1,0 +1,61 @@
+---
+title: "Get operational expenses by date range"
+description: "List operational expenses logged inside a date window."
+api: "GET /api/v1/finops/get-opex-by-date-range/{start_date}/{end_date}"
+---
+
+Returns every operational expense whose `transaction_timestamp` falls inside the requested window. Use this to mirror field and support-related spend into an accounting system, build cost-center reports, or reconcile opex against the support tickets that triggered it.
+
+Each expense is returned with the related customer, Vendo unit, the support ticket it was charged against (if any), and the user who recorded it.
+
+## Authentication
+
+Requires a Sanctum bearer token. See [Authentication](/api-reference/authentication).
+
+## Path parameters
+
+<ParamField path="start_date" type="string" required>
+  Inclusive lower bound for `transaction_timestamp`. Recommended format `YYYY-MM-DD`. Anchored to `00:00:00`.
+</ParamField>
+
+<ParamField path="end_date" type="string" required>
+  Inclusive upper bound for `transaction_timestamp`. Recommended format `YYYY-MM-DD`. Anchored to `23:59:59`.
+</ParamField>
+
+## Request
+
+```bash
+curl https://<your-erp-host>/api/v1/finops/get-opex-by-date-range/2026-06-01/2026-06-12 \
+  -H "Authorization: Bearer <your-token>" \
+  -H "Accept: application/json"
+```
+
+## Response
+
+`200 OK` — expenses are ordered by `transaction_timestamp` descending (newest first).
+
+```json
+{
+  "success": true,
+  "operational_expenses": [
+    {
+      "opex_type": "PARTS",
+      "amount": "320.00",
+      "remarks": "Replacement coin acceptor",
+      "transaction_timestamp": "2026-06-11T14:02:00.000000Z",
+      "customer": { "...": "..." },
+      "vendo": { "...": "..." },
+      "support_ticket": { "...": "..." },
+      "transacted_by": {
+        "name": "Mark Technician"
+      }
+    }
+  ]
+}
+```
+
+## Notes
+
+- All expense types are returned. Filter on `opex_type` client-side if you only need a specific category.
+- `customer`, `vendo`, and `support_ticket` may be `null` for general overhead expenses not tied to a specific unit.
+- An empty `operational_expenses` array is returned when no expenses fall inside the window.

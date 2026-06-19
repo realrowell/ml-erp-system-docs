@@ -1,0 +1,59 @@
+---
+title: "Export customers as CSV"
+description: "Stream the active customer roster for a collection period as CSV."
+api: "GET /api/v1/crm/customers/export"
+---
+
+Streams a CSV of every **active** customer-Vendo contract for a given collection period, optionally narrowed to a set of collection teams. Use this to generate printable collector route sheets, hand off a roster to a third-party system, or snapshot the field assignment for a period.
+
+Rows are sorted by barangay name (natural sort) so the CSV is ready to print as a route sheet.
+
+## Authentication
+
+Requires a Sanctum bearer token. See [Authentication](/api-reference/authentication).
+
+## Query parameters
+
+<ParamField query="collection_period" type="string" required>
+  The collection period's `public_id`. The endpoint returns `404` if no period matches.
+</ParamField>
+
+<ParamField query="teams" type="string[]">
+  Optional list of collection team `public_id`s to filter by. Pass repeated `teams[]` values, e.g. `teams[]=team_a&teams[]=team_b`. When omitted, every team is included.
+</ParamField>
+
+## Request
+
+```bash
+curl "https://<your-erp-host>/api/v1/crm/customers/export?collection_period=cp_01HZ123&teams[]=ct_01HZ456&teams[]=ct_01HZ789" \
+  -H "Authorization: Bearer <your-token>" \
+  -o customers_export.csv
+```
+
+## Response
+
+`200 OK` — the response body is a streamed CSV file (not JSON). Headers:
+
+- `Content-Type: text/csv`
+- `Content-Disposition: attachment; filename=customers_export_YYYY-MM-DD.csv`
+
+The first row is the column header. Subsequent rows are one per active customer contract.
+
+| Column | Description |
+| ------ | ----------- |
+| `ID` | Customer ID (human-readable). |
+| `Name` | Customer name. |
+| `Vendo No.` | Contracted Vendo number. |
+| `Contact Number` | Customer contact number, or `N/A`. |
+| `Landmark` | Address landmark, or `N/A`. |
+| `Address Line` | Street address line, or `N/A`. |
+| `Barangay` | Barangay name. |
+| `Municipality` | Municipality name, or `N/A`. |
+| `Collection Team` | Assigned collection team name. |
+| `Collection Period` | Collection period name. |
+
+## Notes
+
+- Only contracts with `is_active = true` are exported. Cancelled or inactive contracts are excluded.
+- A `422` validation error is returned when `collection_period` is missing or when any `teams[]` value is not a string.
+- For very large rosters, the response is streamed row-by-row — start consuming the body as soon as headers arrive instead of buffering it all in memory.

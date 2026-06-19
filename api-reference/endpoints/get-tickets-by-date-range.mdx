@@ -1,0 +1,64 @@
+---
+title: "Get support tickets by date range"
+description: "List finalized support tickets inside a date window."
+api: "GET /api/v1/supports/get-tickets-from-date-range/{start_date}/{end_date}"
+---
+
+Returns every **finalized** support ticket whose `ticket_timestamp` falls inside the requested window. Use this to mirror resolved tickets into an external CRM, build SLA or technician-performance reports, or feed an analytics warehouse without picking up in-progress work.
+
+Each ticket is returned with the Vendo unit it concerns (and that unit's Vendo contract), the customer who raised it, and the technician assigned to it.
+
+## Authentication
+
+Requires a Sanctum bearer token. See [Authentication](/api-reference/authentication).
+
+## Path parameters
+
+<ParamField path="start_date" type="string" required>
+  Inclusive lower bound for `ticket_timestamp`. Recommended format `YYYY-MM-DD`. Anchored to `00:00:00`.
+</ParamField>
+
+<ParamField path="end_date" type="string" required>
+  Inclusive upper bound for `ticket_timestamp`. Recommended format `YYYY-MM-DD`. Anchored to `23:59:59`.
+</ParamField>
+
+## Request
+
+```bash
+curl https://<your-erp-host>/api/v1/supports/get-tickets-from-date-range/2026-06-01/2026-06-12 \
+  -H "Authorization: Bearer <your-token>" \
+  -H "Accept: application/json"
+```
+
+## Response
+
+`200 OK` — tickets are ordered by `ticket_timestamp` descending (newest first).
+
+```json
+{
+  "success": true,
+  "support_tickets": [
+    {
+      "ticket_number": "ST-2606010000001",
+      "type": "REPAIR",
+      "priority": "HIGH",
+      "status": "RESOLVED",
+      "is_finalized": true,
+      "ticket_timestamp": "2026-06-09T11:20:00.000000Z",
+      "vendo": {
+        "vendo_number": "V-000123",
+        "vendo_contract": { "...": "..." }
+      },
+      "customer": { "...": "..." },
+      "technician": {
+        "name": "Mark Technician"
+      }
+    }
+  ]
+}
+```
+
+## Notes
+
+- Only tickets with `is_finalized = true` are returned. Open and in-progress tickets are excluded — call this endpoint after work has been completed and signed off, not for live triage.
+- An empty `support_tickets` array is returned when no finalized tickets fall inside the window.

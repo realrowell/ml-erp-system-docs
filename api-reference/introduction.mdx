@@ -3,7 +3,7 @@ title: "Introduction"
 description: "Overview of the ERP REST API for integrators."
 ---
 
-The ERP REST API lets external systems read FinOps data (transactions, customer payouts, customer payables) and look up Vendo units scanned from QR codes. Use it when you need to mirror collection data into a data warehouse, drive reporting dashboards, or build companion mobile tooling that resolves Vendo QR codes.
+The ERP REST API lets external systems read FinOps data (transactions, customer payouts, customer payables, operational expenses), pull finalized support tickets, export active customer rosters for a collection period, and look up Vendo units scanned from QR codes. Use it when you need to mirror collection data into a data warehouse, drive reporting dashboards, generate field rosters, or build companion mobile tooling that resolves Vendo QR codes.
 
 ## Base URL
 
@@ -31,7 +31,7 @@ Every endpoint requires a Laravel Sanctum bearer token. See [Authentication](/ap
 
 ## Response format
 
-All endpoints return JSON. Successful responses include a `success` boolean alongside the resource payload:
+Most endpoints return JSON. Successful responses include a `success` boolean alongside the resource payload:
 
 ```json
 {
@@ -45,21 +45,21 @@ Error responses use standard HTTP status codes. A missing resource returns `404`
 ```json
 {
   "success": false,
-  "message": "Vendo not found"
+  "vendo": "Vendo not found."
 }
 ```
 
-Validation errors return `422` with a Laravel-style `errors` object.
+Validation errors return `422` with a Laravel-style `errors` object. The customer export endpoint streams CSV instead of JSON — see its reference page for details.
 
 ## Date-range parameters
 
-The FinOps endpoints accept a `start_date` and `end_date` as path parameters. Both values are parsed permissively (any format Carbon understands), but the recommended canonical form is `YYYY-MM-DD`:
+The FinOps and support-ticket endpoints accept a `start_date` and `end_date` as path parameters. Both values are parsed permissively (any format Carbon understands), but the recommended canonical form is `YYYY-MM-DD`:
 
 ```
 /api/v1/finops/get-transactions-by-date-range/2026-06-01/2026-06-12
 ```
 
-The server expands the range to cover the full day for both bounds — `start_date` is anchored to `00:00:00` and `end_date` to `23:59:59` in the server's local timezone. Records are filtered on each resource's `transaction_timestamp` and returned in ascending order.
+The server expands the range to cover the full day for both bounds — `start_date` is anchored to `00:00:00` and `end_date` to `23:59:59` in the server's local timezone. Records are filtered on each resource's timestamp column and returned in the order documented per endpoint.
 
 ## Endpoints
 
@@ -75,6 +75,15 @@ The server expands the range to cover the full day for both bounds — `start_da
   </Card>
   <Card title="Get customer payables by date range" href="/api-reference/endpoints/get-customer-payables-by-date-range">
     Pull customer payables recorded in a given window.
+  </Card>
+  <Card title="Get operational expenses by date range" href="/api-reference/endpoints/get-opex-by-date-range">
+    Pull operational expenses logged in a given window.
+  </Card>
+  <Card title="Get support tickets by date range" href="/api-reference/endpoints/get-tickets-by-date-range">
+    Pull finalized support tickets resolved in a given window.
+  </Card>
+  <Card title="Export customers as CSV" href="/api-reference/endpoints/export-customers-csv">
+    Stream the active customer roster for a collection period.
   </Card>
   <Card title="Get Vendo from QR code" href="/api-reference/endpoints/get-vendo-from-qrcode">
     Resolve a Vendo unit from a scanned QR payload.

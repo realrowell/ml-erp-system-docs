@@ -1,7 +1,7 @@
 {
   "$schema": "https://mintlify.com/docs.json",
   "theme": "mint",
-  "name": "Mintlify Starter Kit",
+  "name": "ML ERP",
   "colors": {
     "primary": "#16A34A",
     "light": "#07C983",
@@ -11,10 +11,18 @@
   "navigation": {
     "pages": [
       {
-        "group": "Getting Started",
+        "group": "Get started",
         "pages": [
           "index",
           "quickstart"
+        ]
+      },
+      {
+        "group": "Using the app",
+        "pages": [
+          "guides/admin",
+          "guides/technician",
+          "guides/collector"
         ]
       },
       {
@@ -29,23 +37,27 @@
               "api-reference/endpoints/get-transactions-by-date-range",
               "api-reference/endpoints/get-customer-payouts-by-date-range",
               "api-reference/endpoints/get-customer-payables-by-date-range",
+              "api-reference/endpoints/get-opex-by-date-range",
+              "api-reference/endpoints/get-tickets-by-date-range",
+              "api-reference/endpoints/export-customers-csv",
               "api-reference/endpoints/get-vendo-from-qrcode"
             ]
           }
+        ]
+      },
+      {
+        "group": "Changelog",
+        "pages": [
+          "changelog/overview"
         ]
       }
     ],
     "global": {
       "anchors": [
         {
-          "anchor": "Documentation",
-          "href": "https://mintlify.com/docs",
-          "icon": "book-open-cover"
-        },
-        {
-          "anchor": "Blog",
-          "href": "https://mintlify.com/blog",
-          "icon": "newspaper"
+          "anchor": "GitHub",
+          "href": "https://github.com/realrowell/ml-erp-system",
+          "icon": "github"
         }
       ]
     }
@@ -55,16 +67,10 @@
     "dark": "/logo/dark.svg"
   },
   "navbar": {
-    "links": [
-      {
-        "label": "Support",
-        "href": "mailto:hi@mintlify.com"
-      }
-    ],
     "primary": {
       "type": "button",
-      "label": "Dashboard",
-      "href": "https://app.mintlify.com"
+      "label": "GitHub",
+      "href": "https://github.com/realrowell/ml-erp-system"
     }
   },
   "contextual": {
@@ -81,9 +87,7 @@
   },
   "footer": {
     "socials": {
-      "x": "https://x.com/mintlify",
-      "github": "https://github.com/mintlify",
-      "linkedin": "https://linkedin.com/company/mintlify"
+      "github": "https://github.com/realrowell/ml-erp-system"
     }
   }
 }

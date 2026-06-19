@@ -4,7 +4,7 @@ description: "Resolve a Vendo unit from a scanned QR code payload."
 api: "GET /api/v1/vendo-dashboard/get-vendo-from-qrcode"
 ---
 
-Looks up a Vendo unit by the public identifier encoded in its QR code. Use this from a scanner app or field tool to confirm a physical unit, fetch its current status, and route the operator to the right workflow.
+Looks up a Vendo unit by the public identifier encoded in its QR code, then gates the response on the unit's status and the caller's role. Use this from a scanner app or field tool to confirm a physical unit and route the operator to the right workflow — collectors are only allowed through for `ACTIVE` units, while technicians and admins are allowed through for units that are under repair, under maintenance, or offline.
 
 ## Authentication
 
@@ -12,25 +12,33 @@ Requires a Sanctum bearer token. See [Authentication](/api-reference/authenticat
 
 ## Query parameters
 
-<ParamField query="id" type="string" required>
-  The Vendo's `public_id` as encoded in the QR code.
+<ParamField query="id" type="string">
+  The Vendo's `public_id` as encoded in the QR code. This is the value the endpoint uses to look up the record.
 </ParamField>
 
 <ParamField query="vendo_number" type="string">
-  Optional human-readable Vendo number. Accepted for client-side correlation and logged on the server, but not used to look up the record.
+  Optional human-readable Vendo number. Accepted for client-side correlation but not used to look up the record.
+</ParamField>
+
+<ParamField query="vendo_id" type="string">
+  Optional secondary identifier echoed from the QR payload. Accepted for client-side correlation but not used to look up the record.
+</ParamField>
+
+<ParamField query="user_role" type="string">
+  The caller's role. Pass `TECHNICIAN` or `ADMIN` to be allowed through for non-`ACTIVE` units (under repair, under maintenance, or offline). Any other value (or omitting the field) is treated as an unprivileged caller — only `ACTIVE` units are returned.
 </ParamField>
 
 ## Request
 
 ```bash
-curl "https://<your-erp-host>/api/v1/vendo-dashboard/get-vendo-from-qrcode?id=vnd_01HZABC123" \
+curl "https://<your-erp-host>/api/v1/vendo-dashboard/get-vendo-from-qrcode?id=vnd_01HZABC123&user_role=TECHNICIAN" \
   -H "Authorization: Bearer <your-token>" \
   -H "Accept: application/json"
 ```
 
-## Response
+## Responses
 
-`200 OK` — Vendo found.
+`200 OK` — Vendo found and the caller is allowed to act on it.
 
 ```json
 {
@@ -44,27 +52,42 @@ curl "https://<your-erp-host>/api/v1/vendo-dashboard/get-vendo-from-qrcode?id=vn
 }
 ```
 
-`404 Not Found` — no Vendo matches the supplied `id`.
+`403 Forbidden` — Vendo found, but the caller cannot act on it because of its current status. The `vendo` field carries a human-readable reason instead of the Vendo object.
 
 ```json
 {
   "success": false,
-  "message": "Vendo not found"
+  "vendo": "You are not authorize. Vendo is under_repair. Please contact your administrator for assistance."
 }
 ```
-
-`422 Unprocessable Entity` — the `id` parameter is missing or not a string.
 
 ```json
 {
-  "message": "The id field is required.",
-  "errors": {
-    "id": ["The id field is required."]
-  }
+  "success": false,
+  "vendo": "Vendo is inactive"
 }
 ```
 
+`404 Not Found` — no Vendo matches the supplied `id`, or the unit is in an unrecognized status.
+
+```json
+{
+  "success": false,
+  "vendo": "Vendo not found."
+}
+```
+
+## Status-and-role matrix
+
+| Vendo status | Unprivileged caller | `user_role=TECHNICIAN` or `ADMIN` |
+| ------------ | -------------------- | --------------------------------- |
+| `ACTIVE` | `200` — Vendo returned | `200` — Vendo returned |
+| `UNDER_REPAIR`, `UNDER_MAINTENANCE`, `OFFLINE` | `403` — message returned | `200` — Vendo returned |
+| `inactive` | `403` — `"Vendo is inactive"` | `403` — `"Vendo is inactive"` |
+| anything else | `404` — `"Something went wrong."` | `404` — `"Something went wrong."` |
+
 ## Notes
 
-- Always check the top-level `success` flag before reading `vendo` — `vendo` is omitted on `404`.
+- Always check the top-level `success` flag before reading `vendo`. On non-`200` responses, `vendo` is a string error message, not the Vendo object.
 - The lookup is exact match on `public_id`. Pass the value exactly as decoded from the QR payload.
+- The previous version of this endpoint required `id` and returned a `message` field on `404`. Both behaviors have changed: `id` is now nullable at the validation layer (but still required in practice — the lookup returns `404` without it), and all error responses now use the `vendo` field for the message.

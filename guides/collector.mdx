@@ -1,0 +1,68 @@
+---
+title: "Collector guide"
+description: "Run your daily collection route and record vendo collections from your phone"
+---
+
+The **Collector** role is for field staff who visit vendos to collect cash and record transactions. After you sign in, the app takes you to the collector dashboard at `/collector/dashboard`. You can only see and act on the screens described in this guide.
+
+## Who should use this guide
+
+Use this guide if you:
+
+- Belong to a collection team
+- Visit customer sites to pick up cash from vendos
+- Record collections against customer-vendo contracts
+
+## The collector dashboard
+
+The dashboard is built around the **current collection period**. When you open it, the app finds the active period and shows you two lists:
+
+- **Due today** — contracts assigned to your collection team for the current period that have not been collected yet. Work this list top to bottom.
+- **All contracts in this period** — every contract scheduled for the period, with a flag showing whether collection has already been recorded. Use it to confirm your progress and check on units you have already visited.
+
+If no collection period is active, the dashboard is empty. Contact an admin to confirm the schedule.
+
+### What each contract card shows
+
+Each card on the dashboard is a customer-vendo contract. It includes:
+
+- The customer's name and address (barangay and municipality)
+- The vendo assigned to that contract
+- Whether the contract has been collected for the current period
+
+Tap a card to drill into the contract and start the collection.
+
+## Collecting from a vendo (QR scanner)
+
+The fastest way to record a collection in the field is the QR scanner. Open **QR scanner** from the side navigation.
+
+<Steps>
+  <Step title="Scan the QR code">
+    Point your device camera at the QR sticker on the vendo. The app looks up the unit, confirms its customer and contract, and opens the collection flow.
+  </Step>
+  <Step title="Enter the amount collected">
+    Record the cash you are taking from the unit. The amount is recorded as a `collection` transaction with the source set to `mobile`.
+  </Step>
+  <Step title="Confirm">
+    Submit the transaction. The contract on your dashboard immediately flips to "collected" for the current period, and the entry shows up in FinOps for admins to confirm.
+  </Step>
+</Steps>
+
+## Transactions you create
+
+Collections you record from the app are saved as transactions. Each one carries:
+
+| Field    | Value you'll see                                                  |
+| -------- | ----------------------------------------------------------------- |
+| Type     | `collection`                                                       |
+| Status   | `pending` until an admin confirms, then `confirmed`                |
+| Source   | `mobile` (created from the collector app)                          |
+
+If you make a mistake, do not try to delete the entry. Flag it to an admin so they can record an `adjustment` or `refund` transaction against the same contract.
+
+## Tips for a smooth route
+
+- Sort your "Due today" list by location so you visit nearby customers together.
+- Scan the QR sticker rather than searching by hand — it pulls the right customer and contract automatically.
+- Record each collection before moving to the next site, while the cash count is fresh.
+- If a vendo looks damaged or offline, tell your supervisor so a technician can open a repair ticket.
